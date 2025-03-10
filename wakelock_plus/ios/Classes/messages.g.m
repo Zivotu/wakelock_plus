@@ -6,7 +6,11 @@
 #if TARGET_OS_OSX
 #import <FlutterMacOS/FlutterMacOS.h>
 #else
+#if __has_include(<Flutter/Flutter.h>)
 #import <Flutter/Flutter.h>
+#else
+#import "Flutter.h"
+#endif
 #endif
 
 #if !__has_feature(objc_arc)
@@ -16,7 +20,9 @@
 static NSArray<id> *wrapResult(id result, FlutterError *error) {
   if (error) {
     return @[
-      error.code ?: [NSNull null], error.message ?: [NSNull null], error.details ?: [NSNull null]
+      error.code ?: [NSNull null],
+      error.message ?: [NSNull null],
+      error.details ?: [NSNull null]
     ];
   }
   return @[ result ?: [NSNull null] ];
@@ -86,9 +92,9 @@ static id GetNullableObjectAtIndex(NSArray<id> *array, NSInteger key) {
 @implementation WAKELOCKPLUSMessagesPigeonCodecReader
 - (nullable id)readValueOfType:(UInt8)type {
   switch (type) {
-    case 129: 
+    case 129:
       return [WAKELOCKPLUSToggleMessage fromList:[self readValue]];
-    case 130: 
+    case 130:
       return [WAKELOCKPLUSIsEnabledMessage fromList:[self readValue]];
     default:
       return [super readValueOfType:type];
@@ -132,18 +138,19 @@ NSObject<FlutterMessageCodec> *WAKELOCKPLUSGetMessagesCodec(void) {
   });
   return sSharedObject;
 }
+
 void SetUpWAKELOCKPLUSWakelockPlusApi(id<FlutterBinaryMessenger> binaryMessenger, NSObject<WAKELOCKPLUSWakelockPlusApi> *api) {
   SetUpWAKELOCKPLUSWakelockPlusApiWithSuffix(binaryMessenger, api, @"");
 }
 
 void SetUpWAKELOCKPLUSWakelockPlusApiWithSuffix(id<FlutterBinaryMessenger> binaryMessenger, NSObject<WAKELOCKPLUSWakelockPlusApi> *api, NSString *messageChannelSuffix) {
-  messageChannelSuffix = messageChannelSuffix.length > 0 ? [NSString stringWithFormat: @".%@", messageChannelSuffix] : @"";
+  messageChannelSuffix = messageChannelSuffix.length > 0 ? [NSString stringWithFormat:@".%@", messageChannelSuffix] : @"";
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:[NSString stringWithFormat:@"%@%@", @"dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle", messageChannelSuffix]
-        binaryMessenger:binaryMessenger
-        codec:WAKELOCKPLUSGetMessagesCodec()];
+       initWithName:[NSString stringWithFormat:@"%@%@", @"dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.toggle", messageChannelSuffix]
+       binaryMessenger:binaryMessenger
+       codec:WAKELOCKPLUSGetMessagesCodec()];
     if (api) {
       NSCAssert([api respondsToSelector:@selector(toggleMsg:error:)], @"WAKELOCKPLUSWakelockPlusApi api (%@) doesn't respond to @selector(toggleMsg:error:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
@@ -160,9 +167,9 @@ void SetUpWAKELOCKPLUSWakelockPlusApiWithSuffix(id<FlutterBinaryMessenger> binar
   {
     FlutterBasicMessageChannel *channel =
       [[FlutterBasicMessageChannel alloc]
-        initWithName:[NSString stringWithFormat:@"%@%@", @"dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.isEnabled", messageChannelSuffix]
-        binaryMessenger:binaryMessenger
-        codec:WAKELOCKPLUSGetMessagesCodec()];
+       initWithName:[NSString stringWithFormat:@"%@%@", @"dev.flutter.pigeon.wakelock_plus_platform_interface.WakelockPlusApi.isEnabled", messageChannelSuffix]
+       binaryMessenger:binaryMessenger
+       codec:WAKELOCKPLUSGetMessagesCodec()];
     if (api) {
       NSCAssert([api respondsToSelector:@selector(isEnabledWithError:)], @"WAKELOCKPLUSWakelockPlusApi api (%@) doesn't respond to @selector(isEnabledWithError:)", api);
       [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
